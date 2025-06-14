@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wite - Banque Digitale</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            color: #212529;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3436;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #636e72;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #2d3436;
+        }
+        
+        .btn {
+            background: #00b894;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            cursor: pointer;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            background: #00a085;
+            transform: translateY(-1px);
+        }
+        
+        .hero {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 0 20px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #2d3436;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            color: #636e72;
+            margin-bottom: 40px;
+        }
+        
+        .offer-card {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 500px;
+            margin: 0 auto 60px;
+            box-shadow: 0 20px 40px rgba(0,184,148,0.2);
+        }
+        
+        .offer-amount {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .offer-text {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
+            margin: 80px auto;
+            padding: 0 20px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 15px;
+        }
+        
+        .feature-desc {
+            color: #636e72;
+        }
+        
+        .cta-section {
+            background: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 20px;
+        }
+        
+        .cta-section p {
+            font-size: 1.2rem;
+            color: #636e72;
+            margin-bottom: 40px;
+        }
+        
+        .btn-large {
+            background: #00b894;
+            color: white;
+            padding: 18px 36px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .btn-large:hover {
+            background: #00a085;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,184,148,0.3);
+        }
+        
+        .footer {
+            background: #2d3436;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: #b2bec3;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        /* Page de création de compte */
+        .signup-page {
+            display: none;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+        
+        .signup-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .signup-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .signup-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #2d3436;
+            margin-bottom: 10px;
+        }
+        
+        .signup-header p {
+            font-size: 1.1rem;
+            color: #636e72;
+        }
+        
+        .progress-bar {
+            background: #e9ecef;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 40px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: #00b894;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+            border-radius: 4px;
+        }
+        
+        .form-section {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3436;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"] {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #00b894;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0,184,148,0.1);
+        }
+        
+        .card-input {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+        
+        .offer-reminder {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .offer-reminder h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        
+        .submit-section {
+            text-align: center;
+        }
+        
+        .submit-btn {
+            background: #00b894;
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .submit-btn:hover {
+            background: #00a085;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,184,148,0.3);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-btn {
+            background: #e74c3c !important;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 20%, 40%, 60%, 80%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        }
+
+        .input-error {
+            border-color: #e74c3c !important;
+            background: #fdf2f2 !important;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+        
+        .legal-text {
+            font-size: 0.9rem;
+            color: #636e72;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+        
+        .back-btn {
+            background: none;
+            border: 2px solid #00b894;
+            color: #00b894;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: #00b894;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .signup-header h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        .highlight {
+            color: #00b894;
+        }
+    </style>
+</head>
+<body>
+    <!-- Page d'accueil -->
+    <div id="homepage">
+        <header class="header">
+            <nav class="nav">
+                <div class="logo">Wite</div>
+                <ul class="nav-links">
+                    <li><a href="#accueil">Accueil</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#tarifs">Tarifs</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <button class="btn" id="openAccountBtn1">Ouvrir un compte</button>
+            </nav>
+        </header>
+        
+        <main>
+            <section class="hero">
+                <h1>La banque qui vous <span class="highlight">simplifie</span> la vie</h1>
+                <p>Gérez votre argent simplement, sans frais cachés, avec une technologie de pointe</p>
+                
+                <div class="offer-card">
+                    <div class="offer-amount">50€</div>
+                    <div class="offer-text">offerts à l'ouverture de votre compte</div>
+                </div>
+                
+                <button class="btn-large" id="openAccountBtn2">Commencer maintenant</button>
+            </section>
+            
+            <section class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-title">100% Mobile</div>
+                    <div class="feature-desc">Gérez tout depuis votre smartphone avec notre app intuitive</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💳</div>
+                    <div class="feature-title">Carte gratuite</div>
+                    <div class="feature-desc">Carte Mastercard sans frais annuels, utilisable partout dans le monde</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-title">Virements instantanés</div>
+                    <div class="feature-desc">Envoyez et recevez de l'argent en temps réel, 24h/24</div>
+                </div>
+            </section>
+            
+            <section class="cta-section">
+                <h2>Prêt à rejoindre Wite ?</h2>
+                <p>Ouvrez votre compte en quelques minutes et recevez 50€ de bienvenue</p>
+                <button class="btn-large" id="openAccountBtn3">Créer mon compte</button>
+            </section>
+        </main>
+        
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="#">Mentions légales</a>
+                    <a href="#">Politique de confidentialité</a>
+                    <a href="#">Conditions générales</a>
+                    <a href="#">Support</a>
+                </div>
+                <p>&copy; 2025 Wite. Tous droits réservés.</p>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Page de création de compte -->
+    <div id="signuppage" class="signup-page">
+        <div class="signup-container">
+            <button class="back-btn" id="backToHomeBtn">← Retour à l'accueil</button>
+            
+            <div class="signup-header">
+                <h1>Créer votre compte Wite</h1>
+                <p>Quelques informations et vous recevez 50€ !</p>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="offer-reminder">
+                <h3>🎉 50€ offerts</h3>
+                <p>Dès l'ouverture de votre compte, sans condition</p>
+            </div>
+
+            <form id="signupForm">
+                <div class="form-section">
+                    <h3 class="section-title">👤 Informations personnelles</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="prenom">Prénom *</label>
+                            <input type="text" id="prenom" name="prenom" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nom">Nom *</label>
+                            <input type="text" id="nom" name="nom" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Adresse email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="telephone">Numéro de téléphone *</label>
+                            <input type="tel" id="telephone" name="telephone" placeholder="06 12 34 56 78" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="naissance">Date de naissance *</label>
+                            <input type="date" id="naissance" name="naissance" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lieu">Lieu de naissance *</label>
+                            <input type="text" id="lieu" name="lieu" placeholder="Paris, France" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="adresse">Adresse complète *</label>
+                            <input type="text" id="adresse" name="adresse" placeholder="123 Rue de la Paix, 75001 Paris" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3 class="section-title">💳 Informations bancaires</h3>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="carte">Numéro de carte bancaire *</label>
+                            <input type="text" id="carte" name="carte" class="card-input" 
+                                   placeholder="1234 5678 9012 3456" maxlength="19" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expiration">Date d'expiration *</label>
+                            <input type="text" id="expiration" name="expiration" 
+                                   placeholder="MM/AA" maxlength="5" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cvv">Code CVV *</label>
+                            <input type="text" id="cvv" name="cvv" 
+                                   placeholder="123" maxlength="3" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="titulaire">Nom du titulaire de la carte *</label>
+                            <input type="text" id="titulaire" name="titulaire" 
+                                   placeholder="Nom tel qu'inscrit sur la carte" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="submit-section">
+                    <button type="submit" class="submit-btn">
+                        🎉 Recevoir mes 50€ et créer mon compte
+                    </button>
+                    
+                    <div class="legal-text">
+                        En créant votre compte, vous acceptez nos conditions générales 
+                        et notre politique de confidentialité. Vos données sont sécurisées 
+                        et protégées selon les standards bancaires européens.
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Fonctions de navigation
+        function showSignup() {
+            console.log('Affichage de la page de création de compte');
+            document.getElementById('homepage').style.display = 'none';
+            document.getElementById('signuppage').style.display = 'block';
+            updateProgress();
+        }
+        
+        function showHomepage() {
+            console.log('Retour à la page d\'accueil');
+            document.getElementById('homepage').style.display = 'block';
+            document.getElementById('signuppage').style.display = 'none';
+        }
+        
+        function updateProgress() {
+            const inputs = document.querySelectorAll('#signupForm input[required]');
+            const filled = Array.from(inputs).filter(input => input.value.trim().length > 0).length;
+            const progress = (filled / inputs.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+        
+        // Attendre que le DOM soit complètement chargé
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM chargé, initialisation des événements');
+            
+            // Attacher les événements de navigation
+            const openAccountBtns = [
+                document.getElementById('openAccountBtn1'),
+                document.getElementById('openAccountBtn2'),
+                document.getElementById('openAccountBtn3')
+            ];
+            
+            openAccountBtns.forEach(btn => {
+                if (btn) {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        console.log('Bouton création compte cliqué');
+                        showSignup();
+                    });
+                }
+            });
+            
+            const backBtn = document.getElementById('backToHomeBtn');
+            if (backBtn) {
+                backBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showHomepage();
+                });
+            }
+            
+            // Validation functions
+            function validateField(input, minLength = 2) {
+                const value = input.value.trim();
+                const fieldName = input.previousElementSibling.textContent.replace(' *', '');
+                
+                // Retirer les anciens messages d'erreur
+                const existingError = input.parentNode.querySelector('.error-message');
+                if (existingError) {
+                    existingError.remove();
+                }
+                input.classList.remove('input-error');
+                
+                if (value.length === 0) {
+                    showFieldError(input, `${fieldName} est obligatoire`);
+                    return false;
+                }
+                
+                if (value.length < minLength) {
+                    showFieldError(input, `${fieldName} doit contenir au moins ${minLength} caractères`);
+                    return false;
+                }
+                
+                // Validations spécifiques
+                if (input.type === 'email') {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(value)) {
+                        showFieldError(input, 'Adresse email invalide');
+                        return false;
+                    }
+                }
+                
+                if (input.id === 'telephone') {
+                    const phoneRegex = /^[\d\s]{14}$/; // Format: 06 12 34 56 78
+                    if (!phoneRegex.test(value)) {
+                        showFieldError(input, 'Numéro de téléphone invalide (format: 06 12 34 56 78)');
+                        return false;
+                    }
+                }
+                
+                if (input.id === 'carte') {
+                    if (value.replace(/\s/g, '').length !== 16) {
+                        showFieldError(input, 'Le numéro de carte doit contenir 16 chiffres');
+                        return false;
+                    }
+                }
+                
+                if (input.id === 'expiration') {
+                    const expRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+                    if (!expRegex.test(value)) {
+                        showFieldError(input, 'Format invalide (MM/AA)');
+                        return false;
+                    }
+                }
+                
+                if (input.id === 'cvv') {
+                    if (value.length !== 3) {
+                        showFieldError(input, 'Le CVV doit contenir 3 chiffres');
+                        return false;
+                    }
+                }
+                
+                return true;
+            }
+            
+            function showFieldError(input, message) {
+                input.classList.add('input-error');
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = message;
+                input.parentNode.appendChild(errorDiv);
+            }
+            
+            function validateAllFields() {
+                const requiredInputs = document.querySelectorAll('#signupForm input[required]');
+                let allValid = true;
+                
+                requiredInputs.forEach(input => {
+                    if (!validateField(input)) {
+                        allValid = false;
+                    }
+                });
+                
+                return allValid;
+            }
+            
+            // Format du numéro de téléphone
+            const telephoneInput = document.getElementById('telephone');
+            if (telephoneInput) {
+                telephoneInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 2) {
+                        value = value.replace(/(\d{2})(?=\d)/g, '$1 ');
+                    }
+                    e.target.value = value;
+                    updateProgress();
+                });
+            }
+            
+            // Format du numéro de carte
+            const carteInput = document.getElementById('carte');
+            if (carteInput) {
+                carteInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+                    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                    if (formattedValue.length > 19) {
+                        formattedValue = formattedValue.substring(0, 19);
+                    }
+                    e.target.value = formattedValue;
+                    updateProgress();
+                });
+            }
+            
+            // Format de la date d'expiration
+            const expirationInput = document.getElementById('expiration');
+            if (expirationInput) {
+                expirationInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 4) {
+                        value = value.substring(0,2) + '/' + value.substring(2,4);
+                    }
+                    e.target.value = value;
+                    updateProgress();
+                });
+            }
+            
+            // Validation CVV
+            const cvvInput = document.getElementById('cvv');
+            if (cvvInput) {
+                cvvInput.addEventListener('input', function(e) {
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                    updateProgress();
+                });
+            }
+            
+            // Mise à jour de la barre de progression pour tous les champs
+            const allInputs = document.querySelectorAll('#signupForm input');
+            allInputs.forEach(input => {
+                input.addEventListener('input', updateProgress);
+                input.addEventListener('blur', function() {
+                    validateField(this);
+                });
+            });
+            
+            // Soumission du formulaire
+            const signupForm = document.getElementById('signupForm');
+            if (signupForm) {
+                signupForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    console.log('Formulaire soumis');
+                    
+                    const btn = document.querySelector('.submit-btn');
+                    const originalText = btn.innerHTML;
+                    
+                    // Validation complète
+                    if (!validateAllFields()) {
+                        btn.classList.add('error-btn');
+                        btn.innerHTML = '❌ Veuillez corriger les erreurs';
+                        
+                        setTimeout(() => {
+                            btn.classList.remove('error-btn');
+                            btn.innerHTML = originalText;
+                        }, 3000);
+                        return;
+                    }
+                    
+                    // Si tout est valide, procéder à la création
+                    btn.style.background = '#27ae60';
+                    btn.innerHTML = '✅ Compte créé ! Vos 50€ arrivent...';
+                    btn.disabled = true;
+                    
+                    setTimeout(() => {
+                        alert('🎉 Félicitations !\n\nVotre compte Wite a été créé avec succès.\n💰 Vos 50€ de bienvenue ont été crédités.\n📱 Vous recevrez vos identifiants par SMS.');
+                        showHomepage();
+                        signupForm.reset();
+                        updateProgress();
+                        
+                        // Nettoyer les erreurs
+                        document.querySelectorAll('.error-message').forEach(error => error.remove());
+                        document.querySelectorAll('.input-error').forEach(input => input.classList.remove('input-error'));
+                        
+                        btn.style.background = '';
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    }, 2000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
