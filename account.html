@@ -295,94 +295,81 @@
             </div>
         </div>
     </div>
-
-   <script>
-(() => {
-  // --- Utilisateur courant ---
-  function getCurrentUserId() {
-    let userId = localStorage.getItem('currentUserId');
-    if (!userId) {
-      userId = 'USER_' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
-      localStorage.setItem('currentUserId', userId);
+<script>
+  // Initialisation des utilisateurs (si pas déjà en localStorage)
+  function initUsers() {
+    if (!localStorage.getItem('users')) {
+      const users = {
+        USER_123456: { name: "Alice Martin", balance: 75.50 },
+        USER_234567: { name: "Pierre Dubois", balance: 120.00 },
+        USER_345678: { name: "Marie Laurent", balance: 85.25 },
+        USER_456789: { name: "Thomas Bernard", balance: 200.00 },
+        USER_567890: { name: "Sophie Rousseau", balance: 95.75 },
+        USER_000001: { name: "Vous", balance: 50.00 } // utilisateur courant
+      };
+      localStorage.setItem('users', JSON.stringify(users));
     }
-    return userId;
   }
 
-  // --- Chargement des utilisateurs ---
-  function getUsers() {
-    const usersJSON = localStorage.getItem('users');
-    if (usersJSON) {
-      return JSON.parse(usersJSON);
-    } else {
-      // Création d'utilisateurs par défaut
-      const users = {
-        'USER_123456': { name: 'Alice Martin', balance: 75.5 },
-        'USER_234567': { name: 'Pierre Dubois', balance: 120.0 },
-        'USER_345678': { name: 'Marie Laurent', balance: 85.25 },
-        'USER_456789': { name: 'Thomas Bernard', balance: 200.0 },
-        'USER_567890': { name: 'Sophie Rousseau', balance: 95.75 }
-      };
-      const currentUserId = getCurrentUserId();
-      if (!users[currentUserId]) {
-        users[currentUserId] = { name: 'Vous', balance: 50.0 };
-      }
-      localStorage.setItem('users', JSON.stringify(users));
-      return users;
+  // Initialisation des transactions (si pas déjà en localStorage)
+  function initTransactions() {
+    if (!localStorage.getItem('transactions')) {
+      const transactions = [
+        {
+          type: "Solde initial",
+          description: "Ouverture de compte",
+          amount: 50.00,
+          timestamp: new Date().toISOString()
+        }
+      ];
+      localStorage.setItem('transactions', JSON.stringify(transactions));
     }
+  }
+
+  function getUsers() {
+    return JSON.parse(localStorage.getItem('users')) || {};
   }
 
   function saveUsers(users) {
     localStorage.setItem('users', JSON.stringify(users));
   }
 
-  // --- Transactions ---
   function getTransactions() {
-    const txJSON = localStorage.getItem('transactions');
-    if (txJSON) {
-      return JSON.parse(txJSON);
-    } else {
-      const initialTx = [{
-        type: 'Ouverture de compte',
-        description: 'Solde initial',
-        amount: 50.0,
-        timestamp: new Date().toISOString()
-      }];
-      localStorage.setItem('transactions', JSON.stringify(initialTx));
-      return initialTx;
-    }
+    return JSON.parse(localStorage.getItem('transactions')) || [];
   }
 
   function saveTransactions(transactions) {
     localStorage.setItem('transactions', JSON.stringify(transactions));
   }
 
-  // --- Affichage utilisateur courant ---
-  function updateCurrentUserDisplay() {
-    const userIdSpan = document.getElementById('currentUserId');
-    const balanceSpan = document.getElementById('currentBalance');
-    if (!userIdSpan || !balanceSpan) return;
+  function getCurrentUserId() {
+    return "USER_000001"; // fixe l’utilisateur actuel
+  }
 
+  // Affiche ID et solde de l’utilisateur connecté
+  function updateCurrentUserDisplay() {
     const users = getUsers();
     const currentUserId = getCurrentUserId();
     const currentUser = users[currentUserId];
 
-    userIdSpan.textContent = currentUserId;
-    balanceSpan.textContent = currentUser.balance.toFixed(2);
+    document.getElementById('currentUserId').textContent = currentUserId;
+    document.getElementById('currentBalance').textContent = currentUser.balance.toFixed(2);
   }
 
-  // --- Affichage liste utilisateurs ---
-  function displayUsersList(filter = '') {
+  // Affiche la liste des utilisateurs filtrée par recherche (par ID ou nom)
+  function displayUsersList(filter = "") {
     const usersListDiv = document.getElementById('usersList');
-    if (!usersListDiv) return;
-
     const users = getUsers();
+    const filterLower = filter.toLowerCase();
     const currentUserId = getCurrentUserId();
 
-    // Filtrer les utilisateurs selon la recherche (id ou nom)
+    // Vide la liste
+    usersListDiv.innerHTML = '';
+
+    // Filtrer et afficher
     const filteredUsers = Object.entries(users).filter(([id, user]) => {
       if (id === currentUserId) return false; // Ne pas afficher soi-même
-      const search = filter.trim().toLowerCase();
-      return id.toLowerCase().includes(search) || user.name.toLowerCase().includes(search);
+      return id.toLowerCase().includes(filterLower) || user.name.toLowerCase().includes(filterLower);
     });
 
     if (filteredUsers.length === 0) {
@@ -390,90 +377,103 @@
       return;
     }
 
-    // Construire la liste HTML
-    let html = '<ul style="list-style:none; padding-left:0;">';
     filteredUsers.forEach(([id, user]) => {
-      html += `
-        <li style="padding: 8px 12px; border-bottom: 1px solid #ccc; cursor: pointer;"
-            onclick="document.getElementById('recipientId').value='${id}'; window.scrollTo({top: 0, behavior: 'smooth'});">
-          <strong>${user.name}</strong> <br />
-          ID: <span style="font-family: monospace; font-weight: bold;">${id}</span> | Solde: ${user.balance.toFixed(2)}€
-        </li>`;
-    });
-    html += '</ul>';
+      const userDiv = document.createElement('div');
+      userDiv.className = 'user-item';
+      userDiv.style = "padding: 10px; border-bottom: 1px solid #ccc;";
 
-    usersListDiv.innerHTML = html;
+      userDiv.innerHTML = `
+        <strong>${user.name}</strong><br>
+        ID: <span class="user-id">${id}</span><br>
+        Solde: ${user.balance.toFixed(2)} €
+      `;
+
+      usersListDiv.appendChild(userDiv);
+    });
   }
 
-  // --- Affichage historique ---
+  // Affiche l’historique des transactions
   function displayTransactions() {
-    const txListDiv = document.getElementById('transactionsList');
-    if (!txListDiv) return;
-
+    const transactionsListDiv = document.getElementById('transactionsList');
     const transactions = getTransactions();
-    const users = getUsers();
-    const currentUserId = getCurrentUserId();
+    transactionsListDiv.innerHTML = '';
 
     if (transactions.length === 0) {
-      txListDiv.innerHTML = '<p>Aucune transaction.</p>';
+      transactionsListDiv.innerHTML = '<p>Aucune transaction.</p>';
       return;
     }
 
-    // Affiche les 10 dernières transactions
-    const lastTx = transactions.slice(-10).reverse();
+    transactions.forEach(tx => {
+      const txDiv = document.createElement('div');
+      txDiv.className = 'transaction-item';
 
-    let html = '';
-    lastTx.forEach(tx => {
-      const date = new Date(tx.timestamp).toLocaleString();
-      // Déterminer la classe pour couleur montant
-      const classAmount = tx.amount > 0 ? 'positive' : (tx.amount < 0 ? 'negative' : '');
-      html += `
-      <div class="transaction-item">
+      const date = new Date(tx.timestamp);
+      const dateStr = date.toLocaleString();
+
+      txDiv.innerHTML = `
         <div>
           <div class="transaction-type">${tx.type}</div>
-          <div style="color: #666; font-size: 14px;">${tx.description || ''}</div>
-          <div style="color: #999; font-size: 12px;">${date}</div>
+          <div style="color: #666; font-size: 14px;">${tx.description || ''}<br><small>${dateStr}</small></div>
         </div>
-        <div class="transaction-amount ${classAmount}">
-          ${tx.amount > 0 ? '+' : ''}${tx.amount.toFixed(2)}€
+        <div class="transaction-amount ${tx.amount >= 0 ? 'positive' : 'negative'}">
+          ${tx.amount >= 0 ? '+' : ''}${tx.amount.toFixed(2)}€
         </div>
-      </div>`;
-    });
+      `;
 
-    txListDiv.innerHTML = html;
+      transactionsListDiv.appendChild(txDiv);
+    });
   }
 
-  // --- Effectuer un virement ---
-  function performTransfer(recipientId, amount, description) {
+  // Affiche une alerte dans un élément (success ou error)
+  function showAlert(elementId, message, type) {
+    const alertDiv = document.getElementById(elementId);
+    alertDiv.textContent = message;
+    alertDiv.className = 'alert ' + (type === 'success' ? 'success' : 'error');
+    alertDiv.style.display = 'block';
+    setTimeout(() => {
+      alertDiv.style.display = 'none';
+    }, 4000);
+  }
+
+  // Effectuer un virement
+  function performTransfer(recipientIdInput, amountInput, description) {
     const users = getUsers();
     const currentUserId = getCurrentUserId();
     const transactions = getTransactions();
 
-    if (!users[recipientId]) {
+    const recipientIdLower = recipientIdInput.trim().toLowerCase();
+    // Trouve l’ID exact (case-insensitive)
+    const realRecipientId = Object.keys(users).find(id => id.toLowerCase() === recipientIdLower);
+
+    if (!realRecipientId) {
       showAlert('transferAlert', 'Destinataire introuvable.', 'error');
       return false;
     }
-    if (recipientId === currentUserId) {
+
+    if (realRecipientId === currentUserId) {
       showAlert('transferAlert', "Vous ne pouvez pas vous envoyer de l'argent à vous-même.", 'error');
       return false;
     }
+
+    const amount = parseFloat(amountInput);
     if (isNaN(amount) || amount <= 0) {
       showAlert('transferAlert', "Montant invalide.", 'error');
       return false;
     }
+
     if (users[currentUserId].balance < amount) {
       showAlert('transferAlert', "Solde insuffisant.", 'error');
       return false;
     }
 
-    // Mise à jour des soldes
+    // Met à jour les soldes
     users[currentUserId].balance = Math.round((users[currentUserId].balance - amount) * 100) / 100;
-    users[recipientId].balance = Math.round((users[recipientId].balance + amount) * 100) / 100;
+    users[realRecipientId].balance = Math.round((users[realRecipientId].balance + amount) * 100) / 100;
 
-    // Enregistrer la transaction
+    // Enregistre la transaction
     const now = new Date().toISOString();
     transactions.push({
-      type: `Virement vers ${users[recipientId].name}`,
+      type: `Virement vers ${users[realRecipientId].name}`,
       description: description || 'Virement',
       amount: -amount,
       timestamp: now
@@ -487,68 +487,43 @@
 
     saveUsers(users);
     saveTransactions(transactions);
+
     updateCurrentUserDisplay();
     displayUsersList(document.getElementById('searchUser').value);
     displayTransactions();
 
-    showAlert('transferAlert', `Transfert de ${amount.toFixed(2)} € vers ${users[recipientId].name} effectué avec succès !`, 'success');
+    showAlert('transferAlert', `Transfert de ${amount.toFixed(2)} € vers ${users[realRecipientId].name} effectué avec succès !`, 'success');
 
     return true;
   }
 
-  // --- Afficher alertes ---
-  function showAlert(elementId, message, type = 'success') {
-    const alertDiv = document.getElementById(elementId);
-    if (!alertDiv) return;
-    alertDiv.textContent = message;
-    alertDiv.className = 'alert ' + (type === 'error' ? 'error' : 'success');
-    alertDiv.style.display = 'block';
-    setTimeout(() => {
-      alertDiv.style.display = 'none';
-    }, 4000);
-  }
+  // Initialisation et gestion des événements
+  window.addEventListener('DOMContentLoaded', () => {
+    initUsers();
+    initTransactions();
 
-  // --- Setup formulaire ---
-  function setupForm() {
-    const form = document.getElementById('transferForm');
-    if (!form) return;
-
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-
-      const recipientId = document.getElementById('recipientId').value.trim();
-      const amount = parseFloat(document.getElementById('amount').value);
-      const description = document.getElementById('description').value.trim();
-
-      performTransfer(recipientId, amount, description);
-
-      form.reset();
-    });
-  }
-
-  // --- Setup recherche utilisateurs ---
-  function setupSearch() {
-    const input = document.getElementById('searchUser');
-    if (!input) return;
-
-    input.addEventListener('input', () => {
-      const filter = input.value;
-      displayUsersList(filter);
-    });
-  }
-
-  // --- Initialisation ---
-  document.addEventListener('DOMContentLoaded', () => {
-    getCurrentUserId();
-    getUsers();
-    getTransactions();
     updateCurrentUserDisplay();
     displayUsersList();
     displayTransactions();
-    setupForm();
-    setupSearch();
+
+    // Gestion formulaire transfert
+    const transferForm = document.getElementById('transferForm');
+    transferForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const recipientId = document.getElementById('recipientId').value;
+      const amount = document.getElementById('amount').value;
+      const description = document.getElementById('description').value;
+
+      performTransfer(recipientId, amount, description);
+      transferForm.reset();
+    });
+
+    // Gestion recherche utilisateur
+    const searchInput = document.getElementById('searchUser');
+    searchInput.addEventListener('input', e => {
+      displayUsersList(e.target.value);
+    });
   });
-})();
 </script>
 
 </body>
