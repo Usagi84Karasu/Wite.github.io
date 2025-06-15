@@ -297,37 +297,39 @@
     </div>
 
     <script>
-// --- GESTION UTILISATEUR ---
-// Récupère ou crée un ID unique pour l'utilisateur courant
+// --- UTILISATEUR ---
+// Récupère ou crée un ID utilisateur unique et stable dans localStorage
 function getCurrentUserId() {
   let userId = localStorage.getItem('currentUserId');
   if (!userId) {
-    userId = 'USER_' + Math.floor(Math.random() * 100000).toString().padStart(5, '0');
+    userId = 'USER_' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
     localStorage.setItem('currentUserId', userId);
   }
   return userId;
 }
 
-// --- GESTION DES UTILISATEURS ---
-// Récupère la liste des utilisateurs depuis localStorage, ou initialise si pas existante
+// --- UTILISATEURS ---
+// Initialise la liste des utilisateurs avec un exemple si inexistante
 function getUsers() {
-  const storedUsers = localStorage.getItem('users');
-  if (storedUsers) {
-    return JSON.parse(storedUsers);
+  const usersJSON = localStorage.getItem('users');
+  if (usersJSON) {
+    return JSON.parse(usersJSON);
   } else {
-    const currentUserId = getCurrentUserId();
-    const defaultUsers = {
-      'USER_12345': { name: 'Alice Martin', balance: 75.5 },
-      'USER_67890': { name: 'Pierre Dubois', balance: 120 },
-      'USER_54321': { name: 'Marie Laurent', balance: 85.25 },
-      'USER_98765': { name: 'Thomas Bernard', balance: 200 },
-      'USER_11111': { name: 'Sophie Rousseau', balance: 95.75 }
+    // Exemple d'utilisateurs avec ID, nom, solde
+    const users = {
+      'USER_123456': { name: 'Alice Martin', balance: 75.5 },
+      'USER_234567': { name: 'Pierre Dubois', balance: 120.0 },
+      'USER_345678': { name: 'Marie Laurent', balance: 85.25 },
+      'USER_456789': { name: 'Thomas Bernard', balance: 200.0 },
+      'USER_567890': { name: 'Sophie Rousseau', balance: 95.75 }
     };
-    if (!defaultUsers[currentUserId]) {
-      defaultUsers[currentUserId] = { name: 'Vous', balance: 50.00 };
+    const currentUserId = getCurrentUserId();
+    // Si l'utilisateur courant n'est pas dans la liste, l'ajouter
+    if (!users[currentUserId]) {
+      users[currentUserId] = { name: 'Vous', balance: 50.0 };
     }
-    localStorage.setItem('users', JSON.stringify(defaultUsers));
-    return defaultUsers;
+    localStorage.setItem('users', JSON.stringify(users));
+    return users;
   }
 }
 
@@ -336,49 +338,50 @@ function saveUsers(users) {
   localStorage.setItem('users', JSON.stringify(users));
 }
 
-// --- GESTION TRANSACTIONS ---
-// Récupère l'historique des transactions
+// --- TRANSACTIONS ---
+// Récupère l'historique depuis localStorage ou initialise
 function getTransactions() {
-  const stored = localStorage.getItem('transactions');
-  if (stored) return JSON.parse(stored);
-  else {
-    const initial = [{
-      type: 'Solde initial',
-      description: 'Ouverture de compte',
-      amount: 50.00,
+  const txJSON = localStorage.getItem('transactions');
+  if (txJSON) {
+    return JSON.parse(txJSON);
+  } else {
+    const initialTx = [{
+      type: 'Ouverture de compte',
+      description: 'Solde initial',
+      amount: 50.0,
       timestamp: new Date().toISOString()
     }];
-    localStorage.setItem('transactions', JSON.stringify(initial));
-    return initial;
+    localStorage.setItem('transactions', JSON.stringify(initialTx));
+    return initialTx;
   }
 }
 
-// Sauvegarde l'historique des transactions
+// Sauvegarde l'historique dans localStorage
 function saveTransactions(transactions) {
   localStorage.setItem('transactions', JSON.stringify(transactions));
 }
 
-// --- FONCTION DE TRANSFERT ---
-// Effectue un virement de montant de l'utilisateur courant vers recipientId
-function performTransfer(recipientId, amount, description = 'Transfert') {
+// --- FONCTION DE VIREMENT ---
+// Effectue un transfert d'argent entre utilisateur courant et destinataire
+function performTransfer(recipientId, amount, description = 'Virement') {
   const users = getUsers();
   const transactions = getTransactions();
   const currentUserId = getCurrentUserId();
 
   if (!users[recipientId]) {
-    alert("Destinataire introuvable !");
+    alert("Destinataire introuvable.");
     return false;
   }
   if (recipientId === currentUserId) {
-    alert("Vous ne pouvez pas vous envoyer d'argent à vous-même !");
+    alert("Vous ne pouvez pas vous envoyer de l'argent à vous-même.");
     return false;
   }
-  if (amount <= 0) {
-    alert("Montant invalide !");
+  if (isNaN(amount) || amount <= 0) {
+    alert("Montant invalide.");
     return false;
   }
   if (users[currentUserId].balance < amount) {
-    alert("Solde insuffisant !");
+    alert("Solde insuffisant.");
     return false;
   }
 
@@ -386,46 +389,47 @@ function performTransfer(recipientId, amount, description = 'Transfert') {
   users[currentUserId].balance = Math.round((users[currentUserId].balance - amount) * 100) / 100;
   users[recipientId].balance = Math.round((users[recipientId].balance + amount) * 100) / 100;
 
-  // Ajouter la transaction dans l'historique (2 entrées)
-  const timestamp = new Date().toISOString();
+  // Ajout des transactions (2 entrées pour clair)
+  const now = new Date().toISOString();
   transactions.push({
-    type: `Transfert vers ${users[recipientId].name}`,
+    type: `Virement vers ${users[recipientId].name}`,
     description,
     amount: -amount,
-    timestamp
+    timestamp: now
   });
   transactions.push({
-    type: `Transfert reçu de ${users[currentUserId].name}`,
+    type: `Virement reçu de ${users[currentUserId].name}`,
     description,
     amount: amount,
-    timestamp,
-    userId: recipientId
+    timestamp: now
   });
 
+  // Sauvegarde les changements
   saveUsers(users);
   saveTransactions(transactions);
 
-  alert(`Transfert de ${amount}€ vers ${users[recipientId].name} effectué !`);
+  alert(`Transfert de ${amount.toFixed(2)} € vers ${users[recipientId].name} effectué.`);
 
   refreshUI();
 
   return true;
 }
 
-// --- AFFICHAGE DYNAMIQUE ---
-// Met à jour l'affichage du solde, de la liste des utilisateurs et de l'historique
+// --- AFFICHAGE ---
+// Met à jour affichage utilisateur courant, liste des utilisateurs, historique
 function refreshUI() {
   const users = getUsers();
   const transactions = getTransactions();
   const currentUserId = getCurrentUserId();
 
-  // Affiche l'ID et le solde de l'utilisateur courant
-  const userInfoDiv = document.getElementById('user-info');
-  if (userInfoDiv) {
-    userInfoDiv.textContent = `Votre ID : ${currentUserId} - Solde : ${users[currentUserId].balance.toFixed(2)} €`;
+  // Affiche info utilisateur courant
+  const userInfo = document.getElementById('user-info');
+  if (userInfo) {
+    const currentUser = users[currentUserId];
+    userInfo.textContent = `Votre ID : ${currentUserId} | Nom : ${currentUser.name} | Solde : ${currentUser.balance.toFixed(2)} €`;
   }
 
-  // Affiche la liste des utilisateurs (autres que courant)
+  // Liste utilisateurs (hors utilisateur courant)
   const usersList = document.getElementById('users-list');
   if (usersList) {
     usersList.innerHTML = '';
@@ -438,35 +442,36 @@ function refreshUI() {
     }
   }
 
-  // Affiche l'historique des transactions (les 10 dernières)
+  // Historique (10 dernières)
   const historyDiv = document.getElementById('history');
   if (historyDiv) {
-    historyDiv.innerHTML = '<h3>Historique des transactions</h3>';
+    historyDiv.innerHTML = '<h3>Historique des transactions (10 dernières)</h3>';
     const ul = document.createElement('ul');
-    const lastTx = transactions.slice(-10).reverse();
-    for (const tx of lastTx) {
+    const recentTx = transactions.slice(-10).reverse();
+    for (const tx of recentTx) {
       const li = document.createElement('li');
-      li.textContent = `[${new Date(tx.timestamp).toLocaleString()}] ${tx.type} : ${tx.amount.toFixed(2)} € (${tx.description})`;
+      const date = new Date(tx.timestamp).toLocaleString();
+      li.textContent = `[${date}] ${tx.type} : ${tx.amount.toFixed(2)} € (${tx.description})`;
       ul.appendChild(li);
     }
     historyDiv.appendChild(ul);
   }
 }
 
-// --- INITIALISATION ---
-// Ajoute l'événement au formulaire de transfert
+// --- CONFIGURATION FORMULAIRE ---
+// Lie le formulaire de transfert à la fonction de virement
 function setupTransferForm() {
   const form = document.getElementById('transfer-form');
   if (!form) return;
 
-  form.addEventListener('submit', function(event) {
-    event.preventDefault();
+  form.addEventListener('submit', e => {
+    e.preventDefault();
 
     const recipientId = form.elements['recipient-id'].value.trim();
     const amount = parseFloat(form.elements['amount'].value);
 
     if (!recipientId || isNaN(amount)) {
-      alert('Veuillez remplir correctement tous les champs.');
+      alert('Veuillez remplir tous les champs correctement.');
       return;
     }
 
@@ -476,13 +481,13 @@ function setupTransferForm() {
   });
 }
 
-// --- LANCEMENT AU CHARGEMENT DE PAGE ---
+// --- INITIALISATION AU CHARGEMENT ---
 window.addEventListener('DOMContentLoaded', () => {
-  getCurrentUserId();  // s'assure d'avoir un ID utilisateur
-  getUsers();          // initialise les utilisateurs si besoin
-  getTransactions();   // initialise l'historique si besoin
-  refreshUI();         // met à jour l'affichage
-  setupTransferForm(); // configure le formulaire
+  getCurrentUserId();
+  getUsers();
+  getTransactions();
+  refreshUI();
+  setupTransferForm();
 });
 
     </script>
