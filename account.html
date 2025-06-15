@@ -297,268 +297,191 @@
     </div>
 
     <script>
-        // Système de stockage en mémoire pour les utilisateurs et transactions
-        const users = {
-            'USER_12345': { name: 'Alice Martin', balance: 75.50 },
-            'USER_67890': { name: 'Pierre Dubois', balance: 120.00 },
-            'USER_54321': { name: 'Marie Laurent', balance: 85.25 },
-            'USER_98765': { name: 'Thomas Bernard', balance: 200.00 },
-            'USER_11111': { name: 'Sophie Rousseau', balance: 95.75 }
-        };
+// Récupération ou génération de l'ID utilisateur
+let currentUserId = localStorage.getItem('wite_user_id');
+if (!currentUserId) {
+  currentUserId = 'USER_' + Math.floor(Math.random() * 100000).toString().padStart(5, '0');
+  localStorage.setItem('wite_user_id', currentUserId);
+}
 
-        let currentUser = {
-            id: 'USER_' + Math.floor(Math.random() * 100000).toString().padStart(5, '0'),
-            name: 'Vous',
-            balance: 50.00
-        };
+let users = JSON.parse(localStorage.getItem('wite_users')) || {};
+let transactions = JSON.parse(localStorage.getItem('wite_transactions')) || [];
 
-        let transactions = [
-            {
-                type: 'Solde initial',
-                description: 'Ouverture de compte',
-                amount: 50.00,
-                timestamp: new Date()
-            }
-        ];
+if (!users[currentUserId]) {
+  users[currentUserId] = {
+    id: currentUserId,
+    name: 'Vous',
+    balance: 50.0
+  };
+  transactions.push({
+    userId: currentUserId,
+    type: 'Solde initial',
+    description: 'Ouverture de compte',
+    amount: 50.0,
+    timestamp: new Date()
+  });
+}
 
-        // Ajouter l'utilisateur actuel à la liste
-        users[currentUser.id] = currentUser;
+// Utilisateurs de démonstration
+const demoUsers = {
+  'USER_12345': 'Alice',
+  'USER_67890': 'Bob',
+  'USER_54321': 'Charlie'
+};
+for (const id in demoUsers) {
+  if (!users[id]) {
+    users[id] = {
+      id,
+      name: demoUsers[id],
+      balance: 100.0
+    };
+  }
+}
 
-        // Fonction pour afficher les utilisateurs
-        function displayUsers(userList = users) {
-            const usersListElement = document.getElementById('usersList');
-            let html = '';
-            
-            for (const [id, user] of Object.entries(userList)) {
-                if (id !== currentUser.id) {
-                    html += `
-                        <div class="transaction-item" style="cursor: pointer;" onclick="selectUser('${id}')">
-                            <div>
-                                <div class="transaction-type">${user.name}</div>
-                                <div style="color: #666; font-size: 14px;">ID: ${id}</div>
-                            </div>
-                            <div style="color: #4CAF50; font-weight: bold;">Actif</div>
-                        </div>
-                    `;
-                }
-            }
-            
-            usersListElement.innerHTML = html || '<p style="text-align: center; color: #666;">Aucun utilisateur trouvé</p>';
-        }
+// Sauvegarde
+function saveData() {
+  localStorage.setItem('wite_users', JSON.stringify(users));
+  localStorage.setItem('wite_transactions', JSON.stringify(transactions));
+}
 
-        // Fonction pour sélectionner un utilisateur
-        function selectUser(userId) {
-            document.getElementById('recipientId').value = userId;
-        }
+// Affichage des utilisateurs
+function displayUsers(filter = '') {
+  const usersList = document.getElementById('usersList');
+  let html = '';
 
-        // Fonction de recherche d'utilisateurs
-        document.getElementById('searchUser').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            if (searchTerm === '') {
-                displayUsers();
-                return;
-            }
+  Object.values(users).forEach(user => {
+    if (user.id !== currentUserId &&
+      (user.id.includes(filter) || user.name.toLowerCase().includes(filter.toLowerCase()))
+    ) {
+      html += `
+        <div class="transaction-item" onclick="selectUser('${user.id}')">
+          <div>
+            <div class="transaction-type">${user.name}</div>
+            <div>ID: ${user.id}</div>
+          </div>
+          <div style="color:#4CAF50;font-weight:600;">${user.balance.toFixed(2)}€</div>
+        </div>
+      `;
+    }
+  });
 
-            const filteredUsers = {};
-            for (const [id, user] of Object.entries(users)) {
-                if (id.toLowerCase().includes(searchTerm) || 
-                    user.name.toLowerCase().includes(searchTerm)) {
-                    filteredUsers[id] = user;
-                }
-            }
-            displayUsers(filteredUsers);
-        });
+  usersList.innerHTML = html || '<p style="text-align:center;color:#999;">Aucun utilisateur trouvé</p>';
+}
 
-        // Fonction pour afficher les transactions
-        function displayTransactions() {
-            const transactionsElement = document.getElementById('transactionsList');
-            let html = '';
-            
-            transactions.slice().reverse().forEach(transaction => {
-                const isPositive = transaction.amount > 0;
-                html += `
-                    <div class="transaction-item">
-                        <div>
-                            <div class="transaction-type">${transaction.type}</div>
-                            <div style="color: #666; font-size: 14px;">${transaction.description}</div>
-                            <div style="color: #999; font-size: 12px;">${transaction.timestamp.toLocaleString('fr-FR')}</div>
-                        </div>
-                        <div class="transaction-amount ${isPositive ? 'positive' : 'negative'}">
-                            ${isPositive ? '+' : ''}${transaction.amount.toFixed(2)}€
-                        </div>
-                    </div>
-                `;
-            });
-            
-            transactionsElement.innerHTML = html;
-        }
+// Affichage des transactions
+function displayTransactions() {
+  const container = document.getElementById('transactionsList');
+  const myTx = transactions
+    .filter(t => t.userId === currentUserId)
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-        // Fonction pour afficher les alertes
-        function showAlert(message, type = 'success') {
-            const alert = document.getElementById('transferAlert');
-            alert.textContent = message;
-            alert.className = `alert ${type}`;
-            alert.style.display = 'block';
-            
-            setTimeout(() => {
-                alert.style.display = 'none';
-            }, 5000);
-        }
+  container.innerHTML = myTx.map(tx => {
+    const positive = tx.amount >= 0;
+    return `
+      <div class="transaction-item">
+        <div>
+          <div class="transaction-type">${tx.type}</div>
+          <div>${tx.description}</div>
+          <div style="font-size:12px;color:#999;">${new Date(tx.timestamp).toLocaleString()}</div>
+        </div>
+        <div class="transaction-amount ${positive ? 'positive' : 'negative'}">
+          ${positive ? '+' : ''}${tx.amount.toFixed(2)}€
+        </div>
+      </div>
+    `;
+  }).join('');
+}
 
-        // Fonction pour effectuer un transfert
-        function performTransfer() {
-            const recipientId = document.getElementById('recipientId').value.trim().toUpperCase();
-            const amount = parseFloat(document.getElementById('amount').value);
-            const description = document.getElementById('description').value.trim() || 'Transfert';
-            const transferBtn = document.getElementById('transferBtn');
-            
-            console.log('🔄 Tentative de transfert:', { recipientId, amount, description });
-            console.log('👥 Utilisateurs disponibles:', Object.keys(users));
-            console.log('💰 Solde actuel:', currentUser.balance);
-            
-            // Validation
-            if (!recipientId || recipientId === '') {
-                showAlert('❌ Veuillez saisir l\'ID du destinataire.', 'error');
-                return false;
-            }
-            
-            if (isNaN(amount) || amount === '') {
-                showAlert('❌ Veuillez saisir un montant valide.', 'error');
-                return false;
-            }
-            
-            if (amount <= 0) {
-                showAlert('❌ Le montant doit être supérieur à 0€.', 'error');
-                return false;
-            }
-            
-            if (amount > currentUser.balance) {
-                showAlert(`❌ Solde insuffisant. Votre solde actuel : ${currentUser.balance.toFixed(2)}€`, 'error');
-                return false;
-            }
-            
-            if (recipientId === currentUser.id) {
-                showAlert('❌ Vous ne pouvez pas vous envoyer de l\'argent à vous-même.', 'error');
-                return false;
-            }
-            
-            if (!users[recipientId]) {
-                showAlert(`❌ Utilisateur ${recipientId} introuvable. Vérifiez l\'ID du destinataire.`, 'error');
-                return false;
-            }
-            
-            // Animation de chargement
-            transferBtn.innerHTML = '<span class="loading"></span> Traitement...';
-            transferBtn.disabled = true;
-            
-            // Simulation d'un délai de traitement
-            setTimeout(() => {
-                try {
-                    // Effectuer le transfert
-                    currentUser.balance = Math.round((currentUser.balance - amount) * 100) / 100;
-                    users[recipientId].balance = Math.round((users[recipientId].balance + amount) * 100) / 100;
-                    users[currentUser.id].balance = currentUser.balance;
-                    
-                    console.log('✅ Transfert effectué:', {
-                        nouveauSolde: currentUser.balance,
-                        destinataire: users[recipientId].name,
-                        montant: amount
-                    });
-                    
-                    // Mettre à jour l'affichage du solde
-                    document.getElementById('currentBalance').textContent = currentUser.balance.toFixed(2);
-                    
-                    // Ajouter la transaction
-                    transactions.push({
-                        type: `Transfert vers ${users[recipientId].name}`,
-                        description: description,
-                        amount: -amount,
-                        timestamp: new Date()
-                    });
-                    
-                    // Réinitialiser le formulaire
-                    document.getElementById('transferForm').reset();
-                    
-                    // Afficher les transactions mises à jour
-                    displayTransactions();
-                    
-                    // Message de succès
-                    showAlert(`✅ Transfert de ${amount.toFixed(2)}€ vers ${users[recipientId].name} effectué avec succès !`);
-                    
-                } catch (error) {
-                    console.error('❌ Erreur lors du transfert:', error);
-                    showAlert('❌ Erreur lors du transfert. Veuillez réessayer.', 'error');
-                }
-                
-                // Restaurer le bouton
-                transferBtn.innerHTML = 'Envoyer l\'argent';
-                transferBtn.disabled = false;
-            }, 1000);
-            
-            return true;
-        }
-        
-        // Gestion du formulaire de transfert
-        document.addEventListener('DOMContentLoaded', function() {
-            const transferForm = document.getElementById('transferForm');
-            const transferBtn = document.getElementById('transferBtn');
-            
-            // Événement sur le formulaire
-            transferForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                console.log('📝 Formulaire soumis');
-                performTransfer();
-            });
-            
-            // Événement sur le bouton (backup)
-            transferBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log('🖱️ Bouton cliqué');
-                performTransfer();
-            });
-        });
+// Sélection d'un destinataire
+window.selectUser = function (id) {
+  document.getElementById('recipientId').value = id;
+};
 
-        // Initialisation complète
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Initialisation de l\'application Wite');
-            
-            // Initialiser l'affichage
-            document.getElementById('currentUserId').textContent = currentUser.id;
-            document.getElementById('currentBalance').textContent = currentUser.balance.toFixed(2);
-            
-            displayUsers();
-            displayTransactions();
-            
-            console.log('✅ Application initialisée avec succès');
-            console.log('👤 Utilisateur actuel:', currentUser);
-            console.log('👥 Tous les utilisateurs:', users);
-        });
+// Recherche dynamique
+document.getElementById('searchUser').addEventListener('input', (e) => {
+  displayUsers(e.target.value);
+});
 
-        // Simulation de réception d'argent (pour démonstration)
-        setTimeout(() => {
-            setInterval(() => {
-                if (Math.random() < 0.1) { // 10% de chance toutes les 10 secondes
-                    const senders = Object.keys(users).filter(id => id !== currentUser.id);
-                    const senderId = senders[Math.floor(Math.random() * senders.length)];
-                    const amount = Math.floor(Math.random() * 20) + 5; // Entre 5 et 25€
-                    
-                    currentUser.balance += amount;
-                    users[senderId].balance -= amount;
-                    
-                    transactions.push({
-                        type: `Reçu de ${users[senderId].name}`,
-                        description: 'Transfert reçu',
-                        amount: amount,
-                        timestamp: new Date()
-                    });
-                    
-                    document.getElementById('currentBalance').textContent = currentUser.balance.toFixed(2);
-                    displayTransactions();
-                    
-                    showAlert(`💰 Vous avez reçu ${amount.toFixed(2)}€ de ${users[senderId].name} !`);
-                }
-            }, 15000);
-        }, 5000);
+// Affichage de message temporaire
+function showAlert(message, type = 'success') {
+  const alert = document.getElementById('transferAlert');
+  alert.textContent = message;
+  alert.className = `alert ${type}`;
+  alert.style.display = 'block';
+  setTimeout(() => {
+    alert.style.display = 'none';
+  }, 4000);
+}
+
+// Fonction de transfert
+function performTransfer() {
+  const recipientId = document.getElementById('recipientId').value.trim().toUpperCase();
+  const amount = parseFloat(document.getElementById('amount').value);
+  const description = document.getElementById('description').value || 'Transfert';
+
+  if (!users[recipientId]) {
+    showAlert('Destinataire introuvable.', 'error');
+    return;
+  }
+
+  if (recipientId === currentUserId) {
+    showAlert('Impossible d\'envoyer à vous-même.', 'error');
+    return;
+  }
+
+  if (isNaN(amount) || amount <= 0) {
+    showAlert('Montant invalide.', 'error');
+    return;
+  }
+
+  if (amount > users[currentUserId].balance) {
+    showAlert('Solde insuffisant.', 'error');
+    return;
+  }
+
+  // Mise à jour des soldes
+  users[currentUserId].balance -= amount;
+  users[recipientId].balance += amount;
+
+  // Enregistrement des transactions
+  const now = new Date();
+  transactions.push({
+    userId: currentUserId,
+    type: `Virement à ${users[recipientId].name}`,
+    description,
+    amount: -amount,
+    timestamp: now
+  });
+  transactions.push({
+    userId: recipientId,
+    type: `Reçu de ${users[currentUserId].name}`,
+    description,
+    amount: amount,
+    timestamp: now
+  });
+
+  saveData();
+  refreshUI();
+  showAlert(`Envoyé ${amount.toFixed(2)}€ à ${users[recipientId].name}`);
+  document.getElementById('transferForm').reset();
+}
+
+// Rafraîchissement de l’interface
+function refreshUI() {
+  document.getElementById('currentUserId').textContent = currentUserId;
+  document.getElementById('currentBalance').textContent = users[currentUserId].balance.toFixed(2);
+  displayUsers();
+  displayTransactions();
+}
+
+// Gestion du formulaire
+document.getElementById('transferForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  performTransfer();
+});
+
+// Chargement initial
+window.addEventListener('load', refreshUI);
     </script>
 </body>
 </html>
