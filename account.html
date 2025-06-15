@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wite - Votre Banque Digitale</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c8 50%, #a8d8a8 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 100%);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.2);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid #4CAF50;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2d5a2d;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #666;
+        }
+
+        .balance {
+            background: linear-gradient(135deg, #4CAF50, #2d5a2d);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fff8 100%);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #81C784;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.25);
+            border-color: #4CAF50;
+        }
+
+        .card h2 {
+            color: #2d5a2d;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+            background-color: #f8fff8;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4CAF50, #2d5a2d);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .transactions {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f8f0 100%);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.15);
+            border: 1px solid #81C784;
+        }
+
+        .transactions h2 {
+            color: #2d5a2d;
+            margin-bottom: 20px;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+
+        .transaction-item:hover {
+            background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%);
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-type {
+            font-weight: 500;
+        }
+
+        .transaction-amount {
+            font-weight: bold;
+        }
+
+        .transaction-amount.positive {
+            color: #4CAF50;
+        }
+
+        .transaction-amount.negative {
+            color: #f44336;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .alert.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .user-id {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c8 100%);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-weight: bold;
+            color: #2d5a2d;
+            border: 1px solid #4CAF50;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">💳 Wite</div>
+            <div class="user-info">
+                <div>ID: <span class="user-id" id="currentUserId"></span></div>
+                <div class="balance">Solde: <span id="currentBalance">50.00</span>€</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>💸 Envoyer de l'argent</h2>
+                <div class="alert" id="transferAlert"></div>
+                <form id="transferForm">
+                    <div class="form-group">
+                        <label for="recipientId">ID du destinataire</label>
+                        <input type="text" id="recipientId" placeholder="Ex: USER_12345" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="amount">Montant (€)</label>
+                        <input type="number" id="amount" step="0.01" min="0.01" placeholder="0.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description (optionnel)</label>
+                        <input type="text" id="description" placeholder="Remboursement, cadeau...">
+                    </div>
+                    <button type="submit" class="btn" id="transferBtn">
+                        Envoyer l'argent
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>👥 Utilisateurs Wite</h2>
+                <div class="form-group">
+                    <label for="searchUser">Rechercher un utilisateur</label>
+                    <input type="text" id="searchUser" placeholder="Rechercher par ID ou nom...">
+                </div>
+                <div id="usersList"></div>
+            </div>
+        </div>
+
+        <div class="transactions">
+            <h2>📋 Historique des transactions</h2>
+            <div id="transactionsList">
+                <div class="transaction-item">
+                    <div>
+                        <div class="transaction-type">Solde initial</div>
+                        <div style="color: #666; font-size: 14px;">Ouverture de compte</div>
+                    </div>
+                    <div class="transaction-amount positive">+50.00€</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Système de stockage en mémoire pour les utilisateurs et transactions
+        const users = {
+            'USER_12345': { name: 'Alice Martin', balance: 75.50 },
+            'USER_67890': { name: 'Pierre Dubois', balance: 120.00 },
+            'USER_54321': { name: 'Marie Laurent', balance: 85.25 },
+            'USER_98765': { name: 'Thomas Bernard', balance: 200.00 },
+            'USER_11111': { name: 'Sophie Rousseau', balance: 95.75 }
+        };
+
+        let currentUser = {
+            id: 'USER_' + Math.floor(Math.random() * 100000).toString().padStart(5, '0'),
+            name: 'Vous',
+            balance: 50.00
+        };
+
+        let transactions = [
+            {
+                type: 'Solde initial',
+                description: 'Ouverture de compte',
+                amount: 50.00,
+                timestamp: new Date()
+            }
+        ];
+
+        // Ajouter l'utilisateur actuel à la liste
+        users[currentUser.id] = currentUser;
+
+        // Fonction pour afficher les utilisateurs
+        function displayUsers(userList = users) {
+            const usersListElement = document.getElementById('usersList');
+            let html = '';
+            
+            for (const [id, user] of Object.entries(userList)) {
+                if (id !== currentUser.id) {
+                    html += `
+                        <div class="transaction-item" style="cursor: pointer;" onclick="selectUser('${id}')">
+                            <div>
+                                <div class="transaction-type">${user.name}</div>
+                                <div style="color: #666; font-size: 14px;">ID: ${id}</div>
+                            </div>
+                            <div style="color: #4CAF50; font-weight: bold;">Actif</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            usersListElement.innerHTML = html || '<p style="text-align: center; color: #666;">Aucun utilisateur trouvé</p>';
+        }
+
+        // Fonction pour sélectionner un utilisateur
+        function selectUser(userId) {
+            document.getElementById('recipientId').value = userId;
+        }
+
+        // Fonction de recherche d'utilisateurs
+        document.getElementById('searchUser').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            if (searchTerm === '') {
+                displayUsers();
+                return;
+            }
+
+            const filteredUsers = {};
+            for (const [id, user] of Object.entries(users)) {
+                if (id.toLowerCase().includes(searchTerm) || 
+                    user.name.toLowerCase().includes(searchTerm)) {
+                    filteredUsers[id] = user;
+                }
+            }
+            displayUsers(filteredUsers);
+        });
+
+        // Fonction pour afficher les transactions
+        function displayTransactions() {
+            const transactionsElement = document.getElementById('transactionsList');
+            let html = '';
+            
+            transactions.slice().reverse().forEach(transaction => {
+                const isPositive = transaction.amount > 0;
+                html += `
+                    <div class="transaction-item">
+                        <div>
+                            <div class="transaction-type">${transaction.type}</div>
+                            <div style="color: #666; font-size: 14px;">${transaction.description}</div>
+                            <div style="color: #999; font-size: 12px;">${transaction.timestamp.toLocaleString('fr-FR')}</div>
+                        </div>
+                        <div class="transaction-amount ${isPositive ? 'positive' : 'negative'}">
+                            ${isPositive ? '+' : ''}${transaction.amount.toFixed(2)}€
+                        </div>
+                    </div>
+                `;
+            });
+            
+            transactionsElement.innerHTML = html;
+        }
+
+        // Fonction pour afficher les alertes
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('transferAlert');
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Fonction pour effectuer un transfert
+        function performTransfer() {
+            const recipientId = document.getElementById('recipientId').value.trim().toUpperCase();
+            const amount = parseFloat(document.getElementById('amount').value);
+            const description = document.getElementById('description').value.trim() || 'Transfert';
+            const transferBtn = document.getElementById('transferBtn');
+            
+            console.log('🔄 Tentative de transfert:', { recipientId, amount, description });
+            console.log('👥 Utilisateurs disponibles:', Object.keys(users));
+            console.log('💰 Solde actuel:', currentUser.balance);
+            
+            // Validation
+            if (!recipientId || recipientId === '') {
+                showAlert('❌ Veuillez saisir l\'ID du destinataire.', 'error');
+                return false;
+            }
+            
+            if (isNaN(amount) || amount === '') {
+                showAlert('❌ Veuillez saisir un montant valide.', 'error');
+                return false;
+            }
+            
+            if (amount <= 0) {
+                showAlert('❌ Le montant doit être supérieur à 0€.', 'error');
+                return false;
+            }
+            
+            if (amount > currentUser.balance) {
+                showAlert(`❌ Solde insuffisant. Votre solde actuel : ${currentUser.balance.toFixed(2)}€`, 'error');
+                return false;
+            }
+            
+            if (recipientId === currentUser.id) {
+                showAlert('❌ Vous ne pouvez pas vous envoyer de l\'argent à vous-même.', 'error');
+                return false;
+            }
+            
+            if (!users[recipientId]) {
+                showAlert(`❌ Utilisateur ${recipientId} introuvable. Vérifiez l\'ID du destinataire.`, 'error');
+                return false;
+            }
+            
+            // Animation de chargement
+            transferBtn.innerHTML = '<span class="loading"></span> Traitement...';
+            transferBtn.disabled = true;
+            
+            // Simulation d'un délai de traitement
+            setTimeout(() => {
+                try {
+                    // Effectuer le transfert
+                    currentUser.balance = Math.round((currentUser.balance - amount) * 100) / 100;
+                    users[recipientId].balance = Math.round((users[recipientId].balance + amount) * 100) / 100;
+                    users[currentUser.id].balance = currentUser.balance;
+                    
+                    console.log('✅ Transfert effectué:', {
+                        nouveauSolde: currentUser.balance,
+                        destinataire: users[recipientId].name,
+                        montant: amount
+                    });
+                    
+                    // Mettre à jour l'affichage du solde
+                    document.getElementById('currentBalance').textContent = currentUser.balance.toFixed(2);
+                    
+                    // Ajouter la transaction
+                    transactions.push({
+                        type: `Transfert vers ${users[recipientId].name}`,
+                        description: description,
+                        amount: -amount,
+                        timestamp: new Date()
+                    });
+                    
+                    // Réinitialiser le formulaire
+                    document.getElementById('transferForm').reset();
+                    
+                    // Afficher les transactions mises à jour
+                    displayTransactions();
+                    
+                    // Message de succès
+                    showAlert(`✅ Transfert de ${amount.toFixed(2)}€ vers ${users[recipientId].name} effectué avec succès !`);
+                    
+                } catch (error) {
+                    console.error('❌ Erreur lors du transfert:', error);
+                    showAlert('❌ Erreur lors du transfert. Veuillez réessayer.', 'error');
+                }
+                
+                // Restaurer le bouton
+                transferBtn.innerHTML = 'Envoyer l\'argent';
+                transferBtn.disabled = false;
+            }, 1000);
+            
+            return true;
+        }
+        
+        // Gestion du formulaire de transfert
+        document.addEventListener('DOMContentLoaded', function() {
+            const transferForm = document.getElementById('transferForm');
+            const transferBtn = document.getElementById('transferBtn');
+            
+            // Événement sur le formulaire
+            transferForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log('📝 Formulaire soumis');
+                performTransfer();
+            });
+            
+            // Événement sur le bouton (backup)
+            transferBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('🖱️ Bouton cliqué');
+                performTransfer();
+            });
+        });
+
+        // Initialisation complète
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initialisation de l\'application Wite');
+            
+            // Initialiser l'affichage
+            document.getElementById('currentUserId').textContent = currentUser.id;
+            document.getElementById('currentBalance').textContent = currentUser.balance.toFixed(2);
+            
+            displayUsers();
+            displayTransactions();
+            
+            console.log('✅ Application initialisée avec succès');
+            console.log('👤 Utilisateur actuel:', currentUser);
+            console.log('👥 Tous les utilisateurs:', users);
+        });
+
+        // Simulation de réception d'argent (pour démonstration)
+        setTimeout(() => {
+            setInterval(() => {
+                if (Math.random() < 0.1) { // 10% de chance toutes les 10 secondes
+                    const senders = Object.keys(users).filter(id => id !== currentUser.id);
+                    const senderId = senders[Math.floor(Math.random() * senders.length)];
+                    const amount = Math.floor(Math.random() * 20) + 5; // Entre 5 et 25€
+                    
+                    currentUser.balance += amount;
+                    users[senderId].balance -= amount;
+                    
+                    transactions.push({
+                        type: `Reçu de ${users[senderId].name}`,
+                        description: 'Transfert reçu',
+                        amount: amount,
+                        timestamp: new Date()
+                    });
+                    
+                    document.getElementById('currentBalance').textContent = currentUser.balance.toFixed(2);
+                    displayTransactions();
+                    
+                    showAlert(`💰 Vous avez reçu ${amount.toFixed(2)}€ de ${users[senderId].name} !`);
+                }
+            }, 15000);
+        }, 5000);
+    </script>
+</body>
+</html>
